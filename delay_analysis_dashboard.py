@@ -15,6 +15,10 @@ def load_lottieurl(url: str):
         return None
     return r.json()
 
+def vertical_space(height):
+    for i in range(height):
+        st.text('')
+
 def get_checkout_state(row):
     state = 'Unknown'
     if row['state'] == 'ended':
@@ -109,7 +113,10 @@ if __name__ == '__main__':
 
     ### Load gifs
     right_arrow_gif = load_lottieurl('https://assets10.lottiefiles.com/packages/lf20_qrmoBnUE5w.json')
-    
+
+    ### Configure plotly display
+    config = {'displayModeBar': False} # Hide plotly modebar in figures
+
     ### Configure default plotly template
     pio.templates['my_template'] = go.layout.Template(
         layout_margin_t = 50,
@@ -219,18 +226,18 @@ if __name__ == '__main__':
 
         ### Main metrics
         st.header('Main metrics of dataset')
-        main_metrics_cols = st.columns([1,1,1,1,2])
+        main_metrics_cols = st.columns([20,30,50])
         with main_metrics_cols[0]:
             st.metric(label = "Number of rentals", value= nb_rentals)
-        with main_metrics_cols[1]:
             st.metric(label = "Number of cars", value= df['car_id'].nunique())
         with main_metrics_cols[2]:
-            st.metric(label = "Share of checkout delay outliers", value= f"{round(detect_outliers(df, 'delay_at_checkout_in_minutes')['percent_outliers'])}%")
-        with main_metrics_cols[3]:
             st.metric(label = "Share of 'Connect' rentals", value= f"{round(len(df[df['checkin_type'] == 'connect']) /nb_rentals * 100)}%")
-        with main_metrics_cols[4]:
+        with main_metrics_cols[1]:
             st.metric(label = "Share of consecutive rentals of a same car", value= f"{round(len(df[~df['previous_ended_rental_id'].isna()]) /nb_rentals * 100)}%")
-
+            st.metric(
+                label = "Max. delta between consecutive rentals", 
+                value= f"{round(previous_rental_delay_df['time_delta_with_previous_rental_in_minutes'].max())} minutes")
+        
         ### Checkouts overview
         st.header('Checkouts overview')
         checkouts_info_cols = st.columns([35, 40, 25])
@@ -246,7 +253,7 @@ if __name__ == '__main__':
                     },
                 category_orders={"state": ['On time checkout', 'Late checkout', 'Canceled', 'Unknown']},
                 title = "<b>Rental state</b>")
-            st.plotly_chart(state_pie, use_container_width=True)
+            st.plotly_chart(state_pie, use_container_width=True, config = config)
         with checkouts_info_cols[1]:
             delays_boxplot = px.box(
                 late_checkouts_df, y = 'delay_at_checkout_in_minutes', height = 500,
@@ -254,22 +261,26 @@ if __name__ == '__main__':
                 range_y = [0, late_checkouts_upper_fence + 1],
                 title = "<b>Checkout delays breakdown (outliers hidden)</b>")
             delays_boxplot.update_traces(marker_color = colors['Bad'])
-            st.plotly_chart(delays_boxplot, use_container_width=True)
+            st.plotly_chart(delays_boxplot, use_container_width=True, config = config)
         with checkouts_info_cols[2]:
-            for i in range(8):
-                st.text("")
+            vertical_space(4)
             st.metric(
                 label = "", 
-                value=f"{round(len(late_checkouts_df[late_checkouts_df['delay_at_checkout_in_minutes'] >= 60]) / nb_late_checkouts * 100)}% of late checkouts", 
+                value = f"{round(detect_outliers(df, 'delay_at_checkout_in_minutes')['percent_outliers'])}%",
+                delta = f"checkout delays are outliers (> {late_checkouts_upper_fence} minutes)",
+                delta_color = 'inverse'
+                )
+            st.metric(
+                label = "", 
+                value =f"{round(len(late_checkouts_df[late_checkouts_df['delay_at_checkout_in_minutes'] >= 60]) / nb_late_checkouts * 100)}% of late checkouts", 
                 delta = "have a delay of at least 1 hour",
                 delta_color = 'inverse'
                 )
             st.write()
-            for i in range(1):
-                st.text("")
+            vertical_space(1)
             st.metric(
                 label = "", 
-                value=f"{round(len(late_checkouts_df[late_checkouts_df['delay_at_checkout_in_minutes'] <= 30]) / nb_late_checkouts * 100)}% of late checkouts",
+                value =f"{round(len(late_checkouts_df[late_checkouts_df['delay_at_checkout_in_minutes'] <= 30]) / nb_late_checkouts * 100)}% of late checkouts",
                 delta = "have a delay of less than 30 minutes",
                 delta_color = 'normal'
             )
@@ -289,7 +300,7 @@ if __name__ == '__main__':
                     },
                 category_orders={"impact_of_previous_rental_delay": ['No impact', 'Late checkin', 'Cancelation', 'No previous rental filled out']},
                 title = "<b>Impacts of checkout delays on checkin state</b>")
-            st.plotly_chart(impacts_pie, use_container_width=True)
+            st.plotly_chart(impacts_pie, use_container_width=True, config = config)
         with checkins_info_cols[1]:
             checkin_delays_boxplot = go.Figure()
             checkin_delays_boxplot.add_trace(
@@ -309,10 +320,9 @@ if __name__ == '__main__':
                 yaxis_range = [0, late_checkins_canceled_upper_fence + 1],
                 title = "<b>Checkin delays breakdown (some outliers hidden)</b>"
             )
-            st.plotly_chart(checkin_delays_boxplot, use_container_width=True)
+            st.plotly_chart(checkin_delays_boxplot, use_container_width=True, config = config)
         with checkins_info_cols[2]:
-            for i in range(3):
-                st.text("")
+            vertical_space(3)
             st.metric(
                 label = "", 
                 value=f"{round(nb_late_checkins / nb_rentals * 100)}% of checkins",
@@ -326,8 +336,7 @@ if __name__ == '__main__':
                 delta_color = 'inverse'
                 )
             st.write()
-            for i in range(1):
-                st.text("")
+            vertical_space(1)
             st.metric(
                 label = "", 
                 value=f"{round(nb_late_checkins_cancelations / nb_canceled_rentals * 100)}% of all cancelations",
@@ -377,13 +386,12 @@ if __name__ == '__main__':
                 )
             
             #### Evolution of the impacts of checkout delays on checkin state
-            st.markdown("**Impacts of checkout delays on checkin state - evolution:**")
-            if len(previous_rental_delay_with_threshold_df) == 0:
-                late_checkouts_impact_evolution_cols = st.columns([30, 10, 5, 32, 23])
+            st.markdown("**Rentals following a delayed one - evolution of impacts on checkins repartition:**")
+            if len(previous_rental_delay_with_threshold_df['impact_of_previous_rental_delay']) == 0:
+                late_checkouts_impact_evolution_cols = st.columns([30, 10, 5, 25, 30])
                 with late_checkouts_impact_evolution_cols[3]:
-                    for i in range(12):
-                        st.text("")
-                    st.markdown("## No more chekins delayed by a previous checkout ! ✅")
+                    vertical_space(14)
+                    st.markdown("### _No more rentals consecutive to a delayed one_")
             else:
                 late_checkouts_impact_evolution_cols = st.columns([30, 10, 30, 30])
                 with late_checkouts_impact_evolution_cols[2]:
@@ -399,14 +407,13 @@ if __name__ == '__main__':
                             },
                         category_orders={"impact_of_previous_rental_delay": ['No impact', 'Late checkin', 'Cancelation', 'No previous rental filled out']},
                         title = "<b>With threshold</b>")
-                    st.plotly_chart(impacts_pie_with_threshold, use_container_width=True)
+                    st.plotly_chart(impacts_pie_with_threshold, use_container_width=True, config = config)
             with late_checkouts_impact_evolution_cols[0]:
                 impacts_pie_without_threshold = impacts_pie
                 impacts_pie_without_threshold.update_layout(title = "<b>Without threshold</b>")
-                st.plotly_chart(impacts_pie_without_threshold, use_container_width=True)
+                st.plotly_chart(impacts_pie_without_threshold, use_container_width=True, config = config)
             with late_checkouts_impact_evolution_cols[1]:
-                for i in range(10):
-                    st.text("")
+                vertical_space(10)
                 st_lottie(right_arrow_gif, height = 200)
                     
 
