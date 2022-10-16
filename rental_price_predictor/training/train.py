@@ -2,11 +2,11 @@ import argparse
 import pandas as pd
 import time
 import mlflow
-import os
 from mlflow.models.signature import infer_signature
 from sklearn.model_selection import train_test_split, GridSearchCV 
 from sklearn.preprocessing import  StandardScaler, FunctionTransformer, OneHotEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_absolute_error
@@ -30,9 +30,15 @@ if __name__ == "__main__":
     # Call mlflow autolog
     mlflow.sklearn.autolog(log_models=False)
 
-    # Parse arguments given in shell script 'run.sh'
+    # Parse arguments given in shell script 'run.sh' or in Command-Line
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cv")
+    parser.add_argument("--model", default = 'LR', choices = ['LR', 'Ridge', 'RF'])
+    parser.add_argument("--cv", type = int, default = None)
+    parser.add_argument("--alpha", type = float, nargs = "*")
+    parser.add_argument("--max_depth", type = int, nargs="*")
+    parser.add_argument("--min_samples_leaf", type = int, nargs="*")
+    parser.add_argument("--min_samples_split", type = int, nargs="*")
+    parser.add_argument("--n_estimators", type = int, nargs="*")
     args = parser.parse_args()
 
     # Import dataset
@@ -81,16 +87,18 @@ if __name__ == "__main__":
         )
 
     # Model definition
-    cv = int(args.cv)
-    regressor = RandomForestRegressor()
-    model = params = {
-        'max_depth': [20, 50],
-        'min_samples_leaf': [1, 2],
-        'min_samples_split': [2, 5],
-        'n_estimators': [50, 100]
-        }
-    
-    model = GridSearchCV(regressor, param_grid = params, cv = cv, verbose = 3)
+    grid_search_done = False
+    if args.model == 'LR':
+        model = LinearRegression()
+    else: # If a model can have hyperparameters to be tuned, allow a GridSearch with cross-validation
+        regressor_args = {option : parameters for option, parameters in vars(args).items() if (parameters is not None and option not in ['cv', 'model'])}
+        regressor_params = {param_name : values for param_name, values in regressor_args.items()}
+        if args.model == 'Ridge':
+            regressor = Ridge()
+        elif args.model == 'RF':
+            regressor = RandomForestRegressor()
+        model = GridSearchCV(regressor, param_grid = regressor_params, cv = args.cv, verbose = 3)
+        grid_search_done = True
 
     # Pipeline 
     predictor = Pipeline(steps=[
@@ -104,8 +112,9 @@ if __name__ == "__main__":
         # Fit the model on train set
         predictor.fit(X_train, y_train)
 
-        # Log GridSearch's best_params_ attribute
-        mlflow.log_params({"best_param_" + k: v for k, v in model.best_params_.items()})
+        # Log GridSearch's best_params_ attribute if a grid search has been performed
+        if grid_search_done:
+            mlflow.log_params({"best_param_" + k: v for k, v in model.best_params_.items()})
 
         # Make predictions
         y_train_pred = predictor.predict(X_train)
@@ -135,7 +144,7 @@ if __name__ == "__main__":
         mlflow.sklearn.log_model(
             sk_model=predictor,
             artifact_path="appointment_cancellation_detector",
-            registered_model_name="RF_car_rental_price_predictor",
+            registered_model_name=f"{args.model}_car_rental_price_predictor",
             signature=infer_signature(X, y)
         )
         
