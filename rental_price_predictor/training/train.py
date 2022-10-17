@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     # Parse arguments given in shell script 'run.sh' or in Command-Line
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default = 'LR', choices = ['LR', 'Ridge', 'RF'])
+    parser.add_argument("--regressor", default = 'LR', choices = ['LR', 'Ridge', 'RF'])
     parser.add_argument("--cv", type = int, default = None)
     parser.add_argument("--alpha", type = float, nargs = "*")
     parser.add_argument("--max_depth", type = int, nargs="*")
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     numerical_features = []
     binary_features = []
     categorical_features = []
-    for i,t in X.dtypes.iteritems():
+    for i,t in X.dtypes.items():
         if ('float' in str(t)) or ('int' in str(t)) :
             numerical_features.append(i)
         elif ('bool' in str(t)):
@@ -88,14 +88,14 @@ if __name__ == "__main__":
 
     # Model definition
     grid_search_done = False
-    if args.model == 'LR':
+    if args.regressor == 'LR':
         model = LinearRegression()
     else: # If a model can have hyperparameters to be tuned, allow a GridSearch with cross-validation
-        regressor_args = {option : parameters for option, parameters in vars(args).items() if (parameters is not None and option not in ['cv', 'model'])}
+        regressor_args = {option : parameters for option, parameters in vars(args).items() if (parameters is not None and option not in ['cv', 'regressor'])}
         regressor_params = {param_name : values for param_name, values in regressor_args.items()}
-        if args.model == 'Ridge':
+        if args.regressor == 'Ridge':
             regressor = Ridge()
-        elif args.model == 'RF':
+        elif args.regressor == 'RF':
             regressor = RandomForestRegressor()
         model = GridSearchCV(regressor, param_grid = regressor_params, cv = args.cv, verbose = 3)
         grid_search_done = True
@@ -144,7 +144,7 @@ if __name__ == "__main__":
         mlflow.sklearn.log_model(
             sk_model=predictor,
             artifact_path="appointment_cancellation_detector",
-            registered_model_name=f"{args.model}_car_rental_price_predictor",
+            registered_model_name=f"{args.regressor}_car_rental_price_predictor",
             signature=infer_signature(X, y)
         )
         
