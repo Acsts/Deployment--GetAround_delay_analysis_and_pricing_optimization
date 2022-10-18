@@ -1,0 +1,13 @@
+uvicorn[standard]
+gunicorn
+boto3
+pandas
+numpy
+pydantic
+fastapi
+
+# Dependencies needed by the pyfunc mlflow model
+mlflow
+cloudpickle==2.2.0
+scikit-learn==1.1.2
+
