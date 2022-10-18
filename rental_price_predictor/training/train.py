@@ -143,7 +143,7 @@ if __name__ == "__main__":
         # Log model seperately to have more flexibility on setup 
         mlflow.sklearn.log_model(
             sk_model=predictor,
-            artifact_path="appointment_cancellation_detector",
+            artifact_path="car_rental_price_predictor",
             registered_model_name=f"{args.regressor}_car_rental_price_predictor",
             signature=infer_signature(X, y)
         )
