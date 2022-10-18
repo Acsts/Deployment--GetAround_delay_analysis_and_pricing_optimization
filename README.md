@@ -11,9 +11,9 @@ The goal of this project is to develop and deploy several online apps for data a
 
 ## Project and repository architecture
 
-This project can be divided in two subprojects : 
+This project can be divided in two subprojects with their own code and README : 
 1. Delay Analysis (see source code and README [here](https://github.com/Acsts/Deployment--GetAround_delay_analysis_and_pricing_optimization/tree/main/delay_analysis))
-2. Car Rental Price Predictor (see source code and README [here](https://github.com/Acsts/Deployment--GetAround_delay_analysis_and_pricing_optimization/tree/main/delay_analysis))
+2. Car Rental Price Predictor (see source code and README [here](https://github.com/Acsts/Deployment--GetAround_delay_analysis_and_pricing_optimization/tree/main/rental_price_predictor))
 
 ## Deliverables
 
