@@ -45,7 +45,7 @@ if __name__ == "__main__":
     df = pd.read_csv("input_data/get_around_pricing_project.csv", index_col = 0)
 
     # Drop irrelevant rows
-    df = df[(df['mileage'] > 0) & (df['engine_power'] > 0)]
+    df = df[(df['mileage'] >= 0) & (df['engine_power'] > 0)]
 
     # X, y split 
     target_col = 'rental_price_per_day'
