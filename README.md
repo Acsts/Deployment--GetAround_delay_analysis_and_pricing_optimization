@@ -19,7 +19,7 @@ This project can be divided in two subprojects with their own code and README :
 
 - Web dashboard for delay analysis and simulations : **https://acsts-getaround-delay-analysis.herokuapp.com/**
 - Web app hosting the MLFlow tracking server : **https://acsts-getaround-mlflow-server.herokuapp.com/**
-- Web API for predictions : **https://acsts-getaround-price-predict.herokuapp.com/**
+- Web API for car rental price predictions : **https://acsts-getaround-price-predict.herokuapp.com/**
 
 ## Author
 
