@@ -3,7 +3,7 @@
 ## Jedha Fullstack Certification
 
 - email : antoine.costes@live.fr
-- Video link : 
+- Video link : https://share.vidyard.com/watch/EKPorQkw8bqB1DjLjVjQFv?
 
 ## Goal of the project
 
