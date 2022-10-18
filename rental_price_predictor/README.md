@@ -9,12 +9,19 @@ The implementation of this subproject is divided into 2 main steps :
 
 ## Result
 
-- Online app hosting the MLFlow tracking server : https://acsts-getaround-mlflow-server.herokuapp.com/
-- Online app hosting the model API for predictions : https://acsts-getaround-price-predict.herokuapp.com/
+- Online app hosting the MLFlow tracking server : **https://acsts-getaround-mlflow-server.herokuapp.com/**
+- Online app hosting the model API for predictions : **https://acsts-getaround-price-predict.herokuapp.com/**
 
 ## Dataset
 
-The dataset used for this project is provided by Jedha Bootcamp and is available in the 'input_data' subfolder of this subproject, or [here](https://full-stack-assets.s3.eu-west-3.amazonaws.com/Deployment/get_around_pricing_project.csv).
+The dataset used for this project is provided by Jedha Bootcamp and is available in the 'training/input_data' subfolder of this subproject, or [here](https://full-stack-assets.s3.eu-west-3.amazonaws.com/Deployment/get_around_pricing_project.csv).
+
+## API Usage
+
+To get predictions from the car rental price predictor API, you can either:
+- make a CURL request: see an example in the script `curl_api_tester.sh`,
+- make a request using python: see an example in the script `python_api_tester.py`,
+- or go directly to the API web interface: https://acsts-getaround-price-predict.herokuapp.com/
 
 ## Train your own models
 
