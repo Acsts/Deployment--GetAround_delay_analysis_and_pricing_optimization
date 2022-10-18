@@ -31,7 +31,7 @@ app = FastAPI(
 )
 
 class Car(BaseModel):
-    model_key: Literal['Citroën','Peugeot','PGO','Renault','Audi','BMW','Mercedes','other']
+    model_key: Literal['Citroën','Peugeot','PGO','Renault','Audi','BMW','Mercedes','Opel','Volkswagen','Ferrari','Mitsubishi','Nissan','SEAT','Subaru','Toyota','other'] 
     mileage: Union[int, float]
     engine_power: Union[int, float]
     fuel: Literal['diesel','petrol','other']
