@@ -1,9 +1,8 @@
 # GetAround deployment project - Delay analysis and car rental price prediction
 
-## Jedha Fullstack Certification
+## Video Presentation
 
-- email : antoine.costes@live.fr
-- Video link : https://share.vidyard.com/watch/EKPorQkw8bqB1DjLjVjQFv?
+Checkout the 10min project presentation video here : https://share.vidyard.com/watch/EKPorQkw8bqB1DjLjVjQFv?
 
 ## Goal of the project
 
