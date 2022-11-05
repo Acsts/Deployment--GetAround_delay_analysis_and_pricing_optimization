@@ -1,8 +1,10 @@
 # GetAround deployment project - Delay analysis and car rental price prediction
 
+*This project (among others) has been submitted for my Jedha Data Fullstack program certification*
+
 ## Video Presentation
 
-Checkout the 10min project presentation video here : https://share.vidyard.com/watch/EKPorQkw8bqB1DjLjVjQFv?
+**Checkout the 10min project presentation video (in French) here : https://share.vidyard.com/watch/EKPorQkw8bqB1DjLjVjQFv?**
 
 ## Goal of the project
 
